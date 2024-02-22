@@ -15,7 +15,7 @@ public class PathFollower : Kinematic
         myMoveType = new FollowPath();
         myMoveType.character = this;
 
-        myMoveType.targets = targets;
+        //myMoveType.targets = targets;
 
         myRotateType = new LookWhereGoing();
         myRotateType.character = this;

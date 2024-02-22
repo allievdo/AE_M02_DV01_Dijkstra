@@ -5,40 +5,46 @@ using UnityEngine;
 public class FollowPath : Seek
 {
 
-    public GameObject[] targets;
+    public GameObject[] path;
 
-    public float threshold = 0.5f;
-    float decayCoefficient = 100f;
-    float maxAcceleration = 0.5f;
+    float pathOffset;
+    int currentPathIndex;
+    float targetRadius = 0.5f;
 
-   int index = 0;
-    protected override Vector3 getTargetPosition()
+    public override SteeringOutput getSteering()
     {
-        //SteeringOutput result = new SteeringOutput();
-
-        //if (targets[0].transform.position.x > targets[1].transform.position.x)
-        //{
-
-        //}
-
-        foreach (GameObject target in targets)
+        if (target == null)
         {
-            Vector3 directionToTarget = targets[index].transform.position - character.transform.position;
-            float distanceToTarget = directionToTarget.magnitude;
-            //float mySpeed = 5f;
+            int nearestPathIndex = 0;
+            float distanceToNearest = float.PositiveInfinity;
 
-            if (distanceToTarget < threshold) //i know what this does i just dont know how to make it do what i want
+            for( int i = 0; i < path.Length; i++ )
             {
-                index++;
-
-                if (index >= targets.Length)
+                GameObject candidate = path[i];
+                Vector3 vectorToCandidate = candidate.transform.position - character.transform.position;
+                float distanceToCandidate = vectorToCandidate.magnitude;
+                if ( distanceToCandidate < distanceToNearest )
                 {
-                    index = 0;
+                    nearestPathIndex = i;
+                    distanceToNearest = distanceToCandidate;
                 }
             }
+
+            target = path[nearestPathIndex];
         }
 
-        return targets[index].transform.position; //for now
+        float distanceToTarget = (target.transform.position - character.transform.position).magnitude;
+        if(distanceToTarget < targetRadius )
+        {
+            currentPathIndex++;
+            if(currentPathIndex > path.Length - 1)
+            {
+                currentPathIndex = 0;
+            }
 
+            target = path[currentPathIndex];
+        }
+
+        return base.getSteering();
     }
 }
